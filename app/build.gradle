@@ -4,7 +4,7 @@ android {
     compileSdkVersion 27
 
     defaultConfig {
-        applicationId "android_moving_point.amap.com.android_moving_point"
+        applicationId "amap.com.android_moving_point"
         minSdkVersion 15
         targetSdkVersion 27
         versionCode 1

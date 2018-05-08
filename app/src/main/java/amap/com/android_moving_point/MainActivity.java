@@ -38,7 +38,6 @@ public class MainActivity extends Activity implements AMap.OnMapLoadedListener, 
     private SmoothMoveMarker moveMarker;
     private List<LatLng> mOriginList = new ArrayList<LatLng>();
     private List<LatLng> mList = new ArrayList<LatLng>();
-    private List<LatLng> mPoint = new ArrayList<LatLng>();
     private List<Integer> mPointIndex = new ArrayList<Integer>(){{
         add(1);add(55);add(150);
         add(200);add(300);add(400);add(499); }};
@@ -58,7 +57,7 @@ public class MainActivity extends Activity implements AMap.OnMapLoadedListener, 
             amap = mMapView.getMap();
         }
         amap.setOnMapLoadedListener(this);
-        amap.setMapType(AMap.MAP_TYPE_SATELLITE);
+//        amap.setMapType(AMap.MAP_TYPE_SATELLITE);
         amap.showMapText(false);
         mStartButton= (Button) findViewById(R.id.move_start_button);
         mStartButton.setOnClickListener(this);
@@ -68,11 +67,11 @@ public class MainActivity extends Activity implements AMap.OnMapLoadedListener, 
     public void onMapLoaded() {
         addLocpath();
         initMoveMarker();
-        mPolyline = amap.addPolyline(new PolylineOptions().color(Color.YELLOW));
+        mPolyline = amap.addPolyline(new PolylineOptions().color(Color.YELLOW).width(15));
     }
 
 
-    //在地图上添加本地轨迹数据，并处理
+    //读取本地轨迹数据，添加轨迹标记点
     private void addLocpath() {
         mOriginList = TraceAsset.parseLocationsData(this.getAssets(),
                 "traceRecord" + File.separator + "356022065185856.csv");
@@ -82,9 +81,14 @@ public class MainActivity extends Activity implements AMap.OnMapLoadedListener, 
 
         if (mOriginList != null && mOriginList.size()>0) {
 //            mOriginPolyline = amap.addPolyline(new PolylineOptions().addAll(mOriginList).color(Color.GRAY));
-//            amap.moveCamera(CameraUpdateFactory.newLatLngBounds(getBounds(mOriginList), 200));
+            /**
+             * 移动地图可视区域到起始点
+             */
             amap.moveCamera(CameraUpdateFactory.newLatLngZoom(mOriginList.get(0),18));
         }
+        /**
+         * 地图上添加标记点
+         */
         for(int i = 0; i <mOriginList.size(); i++){
             if (mPointIndex.contains(i)){
                 Marker marker = amap.addMarker(new MarkerOptions().position(mOriginList.get(i)));
@@ -93,9 +97,11 @@ public class MainActivity extends Activity implements AMap.OnMapLoadedListener, 
         }
     }
 
-
-
-
+    /**
+     * 计算路线的可视区域LatLngBounds
+     * @param pointlist
+     * @return
+     */
     private LatLngBounds getBounds(List<LatLng> pointlist) {
         LatLngBounds.Builder b = LatLngBounds.builder();
         if (pointlist == null) {
@@ -112,29 +118,18 @@ public class MainActivity extends Activity implements AMap.OnMapLoadedListener, 
     public void onClick(View v) {
         mStartButton.setClickable(false);
         mList.clear();
-
         moveMarker.startSmoothMove();
-
     }
 
+    /**
+     * 初始化移动点marker
+     */
     private void initMoveMarker(){
         // 获取轨迹坐标点
         List<LatLng> points = mOriginList;
-
-
         moveMarker = new SmoothMoveMarker(amap);
         // 设置滑动的图标
         moveMarker.setDescriptor(BitmapDescriptorFactory.fromResource(R.drawable.marker));
-
-        /*
-        //当移动Marker的当前位置不在轨迹起点，先从当前位置移动到轨迹上，再开始平滑移动
-        // LatLng drivePoint = points.get(0);//设置小车当前位置，可以是任意点，这里直接设置为轨迹起点
-        LatLng drivePoint = new LatLng(39.980521,116.351905);//设置小车当前位置，可以是任意点
-        Pair<Integer, LatLng> pair = PointsUtil.calShortestDistancePoint(points, drivePoint);
-        points.set(pair.first, drivePoint);
-        List<LatLng> subList = points.subList(pair.first, points.size());
-        // 设置滑动的轨迹左边点
-        smoothMarker.setPoints(subList);*/
 
         moveMarker.setPoints(points);//设置平滑移动的轨迹list
         moveMarker.setTotalDuration(time);//设置平滑移动的总时间
@@ -147,10 +142,7 @@ public class MainActivity extends Activity implements AMap.OnMapLoadedListener, 
                         int index = moveMarker.getIndex();
                         float markerAngle = moveMarker.getMarker().getRotateAngle();
 
-
-
-                        //todo 判断是否到拍照点
-
+                        //判断是否到拍照点
                         List<Marker> markerList = amap.getMapScreenMarkers();
                         if(mPointIndex.contains(index)){
                             moveMarker.stopMove();
@@ -174,18 +166,19 @@ public class MainActivity extends Activity implements AMap.OnMapLoadedListener, 
 
                         //todo 地图移动旋转
                         //每10个点移动一次中心点
-
                         if ((index%20) == 0){
+                            //需要旋转地图的话，在此改变地图角度
 //                            amapAngle += 10;
                             CameraPosition cameraPosition = new CameraPosition(center, 18, 60, amapAngle);
-                            amap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition),2000,null);
+                            amap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition),2200,null);
                         }else if ((index%20)==10 ){
                             CameraPosition cameraPosition = new CameraPosition(center, 18, 60, amapAngle);
-                            amap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition),2000,null);
+                            amap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition),2200,null);
                         }
 
-
-                        //todo 画线
+                        /**
+                         * 画线
+                         */
                         mList.add(center);
                         mPolyline.setPoints(mList);
 
@@ -194,6 +187,7 @@ public class MainActivity extends Activity implements AMap.OnMapLoadedListener, 
                          */
                         if(distance == 0){
                             mStartButton.setClickable(true);
+                            amap.animateCamera(CameraUpdateFactory.newLatLngBounds(getBounds(mOriginList), 200));
                         }
                     }
                 });
@@ -239,7 +233,7 @@ public class MainActivity extends Activity implements AMap.OnMapLoadedListener, 
     }
 
     /**
-     * 屏幕中心marker 跳动
+     * marker 跳动
      */
     public void startJumpAnimation(Marker marker) {
 

@@ -12,7 +12,7 @@
         <meta-data
             android:name="com.amap.api.v2.apikey"
             android:value="您的key" />
-        <activity android:name="amap.com.android_moving_point.MainActivity">
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
