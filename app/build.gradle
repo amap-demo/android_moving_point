@@ -26,6 +26,6 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    //    compile 'com.amap.api:3dmap:latest.integration'
-    implementation files('src/main/jniLibs/Android_Map3D_SDK_V6.2.0_20180427.jar')
+    implementation 'com.amap.api:3dmap:latest.integration'
+//    implementation files('src/main/jniLibs/Android_Map3D_SDK_V6.2.0_20180427.jar')
 }
