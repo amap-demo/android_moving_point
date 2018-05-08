@@ -9,5 +9,7 @@
 基于3D地图SDK进行封装，实现了移动点轨迹展示。
 
 ## 效果图如下 ##
-
 ![Screenshot](https://raw.githubusercontent.com/amap-demo/android_moving_point/master/apk/screen.png)
+
+## 扫一扫安装 ##
+![Screenshot]( https://raw.githubusercontent.com/amap-demo/android_moving_point/master/apk/1525782811.png) 
