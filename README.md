@@ -26,7 +26,7 @@ SmoothMoveMarker smoothMarker = new SmoothMoveMarker(mAMap);
 // 设置滑动的图标
 smoothMarker.setDescriptor(BitmapDescriptorFactory.fromResource(R.drawable.marker));
 
-// 设置滑动的轨迹左边点
+// 设置滑动的轨迹坐标点
 smoothMarker.setPoints(pointList);
 // 设置滑动的总时间
 smoothMarker.setTotalDuration(time);
